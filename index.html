@@ -8,24 +8,16 @@
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    
-    <!-- Babel untuk memproses JSX di browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState } = React;
 
         // --- ICON COMPONENTS ---
         const Icons = {
@@ -43,28 +35,25 @@
             Plus: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>,
             X: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
             Save: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
-            Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+            Alert: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
+            Rotate: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
         };
 
-        // --- DATA AWAL ---
         const INITIAL_EMPLOYEES = [
-            // Kitchen (5)
             { id: 'k1', name: 'Komang Sri Yati Utami', role: 'Kitchen', rank: 'Senior' },
             { id: 'k2', name: 'Shada Amalia', role: 'Kitchen', rank: 'Junior' },
             { id: 'k3', name: 'Iqbal Arasyid', role: 'Kitchen', rank: 'Mid' },
             { id: 'k4', name: 'Fitri Ainur Sabita', role: 'Kitchen', rank: 'Mid' },
             { id: 'k5', name: 'Ovy Putri Novia', role: 'Kitchen', rank: 'Junior' },
-            // Barista (5)
             { id: 'b1', name: 'Hidayatur Rahman', role: 'Barista', rank: 'Leader' }, 
             { id: 'b2', name: 'Renita Aulia Jasmin', role: 'Barista', rank: 'Mid' },
             { id: 'b3', name: 'Ansyari Fachmi Ridani', role: 'Barista', rank: 'Mid' },
             { id: 'b4', name: 'Ahmad Maulidan Noor', role: 'Barista', rank: 'Junior' },
             { id: 'b5', name: 'Samlawi', role: 'Barista', rank: 'Junior' },
-            // Kasir (3)
             { id: 'c1', name: 'Nahjatus Sabela', role: 'Kasir', rank: 'Senior' },
             { id: 'c2', name: 'Jihan Permata Sari', role: 'Kasir', rank: 'Mid' },
             { id: 'c3', name: 'Rusdhani', role: 'Kasir', rank: 'Junior' },
-            // Server/Tim Lain (4)
             { id: 's1', name: 'Ilham Ali Naufal', role: 'Server', rank: 'Mid' },
             { id: 's2', name: 'Rifky Arya Ramadhani', role: 'Server', rank: 'Mid' },
             { id: 's3', name: 'Muhammad Zikrillah', role: 'Server', rank: 'Junior' },
@@ -76,8 +65,6 @@
         const WEEKS = [1, 2, 3, 4];
         const ROLES = ['Kitchen', 'Barista', 'Kasir', 'Server'];
         const RANKS = ['Junior', 'Mid', 'Senior', 'Leader'];
-
-        // --- COMPONENTS ---
 
         const StatCard = ({ icon, title, value, desc, colorClass }) => {
             const IconComponent = Icons[icon];
@@ -104,7 +91,6 @@
             const [editingId, setEditingId] = useState(null); 
             const [formData, setFormData] = useState({ name: '', role: 'Barista', rank: 'Junior' });
 
-            // --- CRUD Functions ---
             const handleOpenModal = (employee = null) => {
                 if (employee) {
                     setEditingId(employee.id);
@@ -119,16 +105,10 @@
             const handleSaveEmployee = (e) => {
                 e.preventDefault();
                 if (!formData.name.trim()) return;
-
                 if (editingId) {
-                    setEmployees(employees.map(emp => 
-                        emp.id === editingId ? { ...emp, ...formData } : emp
-                    ));
+                    setEmployees(employees.map(emp => emp.id === editingId ? { ...emp, ...formData } : emp));
                 } else {
-                    const newEmployee = {
-                        id: Date.now().toString(),
-                        ...formData
-                    };
+                    const newEmployee = { id: Date.now().toString(), ...formData };
                     setEmployees([...employees, newEmployee]);
                 }
                 setIsModalOpen(false);
@@ -140,72 +120,120 @@
                 }
             };
 
-            // --- Roster Logic ---
+            // --- FIXED LOGIC: ROLLING OFF SYSTEM ---
             const shuffle = (array) => [...array].sort(() => Math.random() - 0.5);
 
             const generateMonthRoster = () => {
                 let monthData = {};
+                let offPointer = 0; // Pointer global untuk rotasi libur agar adil sepanjang bulan
+
                 WEEKS.forEach(weekNum => {
                     let weekRoster = {};
+                    
                     DAYS.forEach(day => {
                         let dailyAssignment = { s1: [], s2: [], s3: [], off: [] };
-                        
-                        let availableKitchen = shuffle(employees.filter(e => e.role === 'Kitchen'));
-                        let availableBarista = shuffle(employees.filter(e => e.role === 'Barista'));
-                        let availableKasir = shuffle(employees.filter(e => e.role === 'Kasir'));
-                        let availableServer = shuffle(employees.filter(e => e.role === 'Server'));
 
-                        // Shift 2 (Priority - War Zone)
-                        const aceBarista = availableBarista.find(b => b.rank === 'Leader');
-                        if (aceBarista) {
-                            availableBarista = availableBarista.filter(b => b.id !== aceBarista.id);
-                            dailyAssignment.s2.push(aceBarista);
-                            if(availableBarista.length > 0) dailyAssignment.s2.push(availableBarista.pop());
-                        } else {
-                            for(let i=0; i<2; i++) if(availableBarista.length) dailyAssignment.s2.push(availableBarista.pop());
+                        // 1. TENTUKAN SIAPA YANG LIBUR HARI INI (ROLLING 3 ORANG)
+                        // Logika: Total 17 karyawan. Kita butuh 14 per hari. Surplus 3.
+                        // Jadi kita paksa 3 orang libur bergilir setiap hari berdasarkan urutan index.
+                        // Ini menjamin hari Minggu pun HANYA 3 orang yang libur.
+                        
+                        let todaysOffIds = [];
+                        for(let i=0; i<3; i++) {
+                             // Gunakan modulo agar pointer berputar balik ke 0 setelah karyawan terakhir
+                             const index = offPointer % employees.length;
+                             todaysOffIds.push(employees[index].id);
+                             offPointer++; 
                         }
 
-                        for(let i=0; i<3; i++) if(availableKitchen.length) dailyAssignment.s2.push(availableKitchen.pop());
-                        for(let i=0; i<2; i++) if(availableServer.length) dailyAssignment.s2.push(availableServer.pop());
-                        for(let i=0; i<1; i++) if(availableKasir.length) dailyAssignment.s2.push(availableKasir.pop());
+                        // Filter Siapa yang Available (Total karyawan - yang jatah libur hari ini)
+                        let availableForWork = employees.filter(e => !todaysOffIds.includes(e.id));
+                        
+                        // Pisahkan per Role dari pool available
+                        let poolKitchen = shuffle(availableForWork.filter(e => e.role === 'Kitchen'));
+                        let poolBarista = shuffle(availableForWork.filter(e => e.role === 'Barista'));
+                        let poolKasir = shuffle(availableForWork.filter(e => e.role === 'Kasir'));
+                        let poolServer = shuffle(availableForWork.filter(e => e.role === 'Server'));
 
-                        // Shift 1
-                        if(availableKitchen.length) dailyAssignment.s1.push(availableKitchen.pop());
-                        if(availableBarista.length) dailyAssignment.s1.push(availableBarista.pop());
-                        if(availableServer.length) dailyAssignment.s1.push(availableServer.pop());
-                        else if (availableKasir.length) dailyAssignment.s1.push(availableKasir.pop());
+                        // Fungsi Helper Pengganti (Substitute)
+                        // Jika Role utama habis (karena libur), ambil dari Server/Freelance
+                        const pickStaff = (rolePool, preferredRole) => {
+                            if (rolePool.length > 0) return rolePool.pop();
+                            
+                            // Logika Substitusi:
+                            // Kitchen/Barista bisa digantikan Server/Freelance jika kepepet
+                            if (preferredRole === 'Kitchen' || preferredRole === 'Barista' || preferredRole === 'Kasir') {
+                                if (poolServer.length > 0) {
+                                    const sub = poolServer.pop();
+                                    sub.isSubstitute = true; 
+                                    return sub;
+                                }
+                            }
+                            return null;
+                        };
 
-                        // Shift 3
-                        if(availableKitchen.length) dailyAssignment.s3.push(availableKitchen.pop());
-                        // Priority for overlap: Barista/Server are best for support
+                        // --- SHIFT 2 (PRIORITAS UTAMA - 8 Orang) ---
+                        // 3 Kitchen
+                        for(let i=0; i<3; i++) { const s = pickStaff(poolKitchen, 'Kitchen'); if(s) dailyAssignment.s2.push(s); }
+                        // 2 Barista (Cari Leader dulu kalau ada)
+                        const leader = poolBarista.find(b => b.rank === 'Leader');
+                        if(leader) {
+                            poolBarista = poolBarista.filter(b => b.id !== leader.id);
+                            dailyAssignment.s2.push(leader);
+                            const s = pickStaff(poolBarista, 'Barista'); if(s) dailyAssignment.s2.push(s);
+                        } else {
+                            for(let i=0; i<2; i++) { const s = pickStaff(poolBarista, 'Barista'); if(s) dailyAssignment.s2.push(s); }
+                        }
+                        // 2 Server
+                        for(let i=0; i<2; i++) { const s = pickStaff(poolServer, 'Server'); if(s) dailyAssignment.s2.push(s); }
+                        // 1 Kasir
+                        for(let i=0; i<1; i++) { const s = pickStaff(poolKasir, 'Kasir'); if(s) dailyAssignment.s2.push(s); }
+
+
+                        // --- SHIFT 1 (3 Orang) ---
+                        const s1K = pickStaff(poolKitchen, 'Kitchen'); if(s1K) dailyAssignment.s1.push(s1K);
+                        const s1B = pickStaff(poolBarista, 'Barista'); if(s1B) dailyAssignment.s1.push(s1B);
+                        // Server / Kasir sisa (Fleksibel)
+                        if(poolServer.length > 0) dailyAssignment.s1.push(poolServer.pop());
+                        else if(poolKasir.length > 0) dailyAssignment.s1.push(poolKasir.pop());
+
+
+                        // --- SHIFT 3 (3 Orang) ---
                         let overlapCandidate = null;
 
-                        if(availableBarista.length) {
-                            overlapCandidate = availableBarista.pop();
+                        const s3K = pickStaff(poolKitchen, 'Kitchen'); if(s3K) dailyAssignment.s3.push(s3K);
+                        
+                        // Posisi Tengah (Barista/Server)
+                        if(poolBarista.length > 0) {
+                            overlapCandidate = poolBarista.pop();
                             dailyAssignment.s3.push(overlapCandidate);
-                        } else if (availableServer.length) {
-                            overlapCandidate = availableServer.pop();
+                        } else if(poolServer.length > 0) {
+                            overlapCandidate = poolServer.pop();
                             dailyAssignment.s3.push(overlapCandidate);
                         }
-                        if(availableKasir.length) dailyAssignment.s3.push(availableKasir.pop());
+
+                        // Kasir Malam
+                        const s3C = pickStaff(poolKasir, 'Kasir'); if(s3C) dailyAssignment.s3.push(s3C);
+
 
                         // --- LOGIKA OVERLAP (Jumat-Minggu) ---
                         const isWeekend = WEEKEND_DAYS.includes(day);
                         if (isWeekend && overlapCandidate) {
-                            // Tandai kandidat ini sebagai Overlap
-                            // Kita modifikasi object di dalam array s3
                             const index = dailyAssignment.s3.findIndex(e => e.id === overlapCandidate.id);
                             if(index !== -1) {
                                 dailyAssignment.s3[index] = { ...dailyAssignment.s3[index], isOverlap: true };
                             }
                         }
 
-                        // Off
-                        dailyAssignment.off = [...availableKitchen, ...availableBarista, ...availableKasir, ...availableServer];
+                        // --- SET YANG LIBUR HARI INI ---
+                        // Ini pasti 3 orang yang sudah ditentukan di awal loop
+                        dailyAssignment.off = employees.filter(e => todaysOffIds.includes(e.id));
+
                         weekRoster[day] = dailyAssignment;
                     });
                     monthData[weekNum] = weekRoster;
                 });
+                
                 setRosterData(monthData);
                 setActiveTab('roster');
                 setActiveWeek(1);
@@ -215,7 +243,6 @@
 
             return (
                 <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-10">
-                    {/* Header */}
                     <header className="bg-slate-900 text-white p-4 shadow-lg sticky top-0 z-40">
                         <div className="max-w-5xl mx-auto flex justify-between items-center">
                             <div>
@@ -223,46 +250,29 @@
                                     <Icons.Coffee className="text-amber-400" size={24} />
                                     Payboss Roster
                                 </h1>
-                                <p className="text-xs text-slate-400">Strategi Asimetris & Overlap</p>
+                                <p className="text-xs text-slate-400">Strategi Asimetris & Rolling Off</p>
                             </div>
-                            <button 
-                                onClick={generateMonthRoster}
-                                className="bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-amber-500/20 shadow-lg"
-                            >
-                                <Icons.RefreshCw size={16} />
-                                Generate Jadwal
+                            <button onClick={generateMonthRoster} className="bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-amber-500/20 shadow-lg">
+                                <Icons.RefreshCw size={16} /> Generate Jadwal
                             </button>
                         </div>
                     </header>
 
-                    {/* Main Content */}
                     <main className="max-w-5xl mx-auto p-4">
-                        
-                        {/* Nav Tabs */}
                         <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-between items-start sm:items-center">
                             <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-                                <button 
-                                    onClick={() => setActiveTab('dashboard')} 
-                                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === 'dashboard' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border'}`}
-                                >
+                                <button onClick={() => setActiveTab('dashboard')} className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === 'dashboard' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border'}`}>
                                     <Icons.LayoutDashboard size={16} /> Dashboard
                                 </button>
-                                <button 
-                                    onClick={() => setActiveTab('roster')} 
-                                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === 'roster' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border'}`}
-                                >
+                                <button onClick={() => setActiveTab('roster')} className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === 'roster' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border'}`}>
                                     <Icons.UserCheck size={16} /> Jadwal Aktif
                                 </button>
-                                <button 
-                                    onClick={() => setActiveTab('employees')} 
-                                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === 'employees' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border'}`}
-                                >
+                                <button onClick={() => setActiveTab('employees')} className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === 'employees' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border'}`}>
                                     <Icons.Users size={16} /> Database
                                 </button>
                             </div>
                         </div>
 
-                        {/* DASHBOARD VIEW */}
                         {activeTab === 'dashboard' && (
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -272,59 +282,41 @@
                                 </div>
                                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                        <Icons.Clock size={20} className="text-red-500"/>
-                                        Strategi Overlap (Jumat - Minggu)
+                                        <Icons.Rotate size={20} className="text-green-500"/>
+                                        Solusi: Rolling Off (Libur Bergilir)
                                     </h2>
-                                    <div className="bg-red-50 p-4 rounded-lg border border-red-100 flex gap-4 items-start">
-                                        <div className="bg-red-100 p-2 rounded-full"><Icons.Zap size={24} className="text-red-600"/></div>
-                                        <div>
-                                            <h3 className="font-bold text-red-900">Bantuan Tempur Pukul 20:00</h3>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                                            <h3 className="font-bold text-green-900 flex items-center gap-2"><Icons.UserCheck size={16}/> Distribusi Merata</h3>
                                             <p className="text-sm text-slate-700 mt-1">
-                                                Pada akhir pekan, 1 Staff Shift Malam akan masuk 3 jam lebih awal (Overlap). 
-                                                Mereka membantu Rush Hour Shift 2, lalu lanjut Shift 3 normal.
+                                                Tidak ada lagi penumpukan libur di hari Minggu. Sistem merotasi 3 orang libur setiap harinya secara urut.
                                             </p>
                                         </div>
-                                    </div>
-                                    
-                                    <h2 className="text-lg font-bold mb-4 mt-8 flex items-center gap-2">
-                                        <Icons.BarChart3 size={20} className="text-slate-500"/>
-                                        Analisis Beban Kerja
-                                    </h2>
-                                    <div className="relative h-48 flex items-end justify-between gap-1 px-2 pb-6 border-b border-slate-200">
-                                        {[
-                                            {h: '20%', t: '08:00'}, {h: '25%', t: '10:00'}, {h: '30%', t: '12:00'}, {h: '40%', t: '14:00'}, 
-                                            {h: '60%', t: '16:00'}, {h: '80%', t: '18:00'}, {h: '100%', t: '20:00'}, {h: '90%', t: '22:00'}, 
-                                            {h: '50%', t: '00:00'}, {h: '30%', t: '02:00'}
-                                        ].map((bar, idx) => (
-                                            <div key={idx} className="flex flex-col items-center w-full group">
-                                                <div className={`w-full max-w-[30px] rounded-t-sm ${idx === 6 || idx === 7 ? 'bg-amber-500' : 'bg-slate-300'}`} style={{height: bar.h}}></div>
-                                                <span className="text-[10px] mt-2 text-slate-500 absolute bottom-0 translate-y-full">{bar.t}</span>
-                                            </div>
-                                        ))}
+                                        <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                                            <h3 className="font-bold text-amber-900 flex items-center gap-2"><Icons.Zap size={16}/> Minggu Full Team</h3>
+                                            <p className="text-sm text-slate-700 mt-1">
+                                                Dijamin hari Minggu tetap memiliki 14 staff aktif, karena kuota libur disebar rata ke Senin-Sabtu juga.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* ROSTER VIEW */}
                         {activeTab === 'roster' && (
                             <div className="space-y-6">
                                 {!rosterData ? (
                                     <div className="text-center py-20 bg-white rounded-xl border border-dashed border-slate-300">
                                         <Icons.Coffee size={48} className="mx-auto text-slate-300 mb-4" />
                                         <p className="text-slate-500 mb-4">Belum ada jadwal yang dibuat.</p>
-                                        <button onClick={generateMonthRoster} className="bg-slate-900 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-800">
-                                            Generate Jadwal Bulan Ini
-                                        </button>
+                                        <button onClick={generateMonthRoster} className="bg-slate-900 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-800">Generate Jadwal Bulan Ini</button>
                                     </div>
                                 ) : (
                                     <>
                                         <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
                                             <span className="text-xs font-bold text-slate-500 px-2 uppercase">Pilih Minggu:</span>
                                             {WEEKS.map(w => (
-                                                <button key={w} onClick={() => setActiveWeek(w)} className={`px-4 py-2 rounded-md text-sm font-bold transition-all whitespace-nowrap ${activeWeek === w ? 'bg-amber-500 text-white shadow-md' : 'hover:bg-slate-100 text-slate-600'}`}>
-                                                    Minggu {w}
-                                                </button>
+                                                <button key={w} onClick={() => setActiveWeek(w)} className={`px-4 py-2 rounded-md text-sm font-bold transition-all whitespace-nowrap ${activeWeek === w ? 'bg-amber-500 text-white shadow-md' : 'hover:bg-slate-100 text-slate-600'}`}>Minggu {w}</button>
                                             ))}
                                         </div>
                                         <div className="grid gap-6">
@@ -335,24 +327,28 @@
                                                             {day} 
                                                             {WEEKEND_DAYS.includes(day) && <span className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded font-bold">SUPER PEAK</span>}
                                                         </h3>
-                                                        <span className="text-xs bg-white px-2 py-1 rounded border border-slate-300 text-slate-500 hidden sm:inline-block">
-                                                            Libur: {currentRoster[day].off.length}
-                                                        </span>
+                                                        <span className="text-xs bg-white px-2 py-1 rounded border border-slate-300 text-slate-500 hidden sm:inline-block">Libur: {currentRoster[day].off.length}</span>
                                                     </div>
                                                     <div className="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-                                                        {/* S1 */}
+                                                        {/* SHIFT 1 */}
                                                         <div className="p-4 bg-blue-50/30">
                                                             <div className="flex items-center gap-2 mb-3"><span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded">PAGI (3)</span></div>
                                                             <ul className="space-y-2">
                                                                 {currentRoster[day].s1.map(staff => (
                                                                     <li key={staff.id} className="text-sm flex items-start gap-2">
                                                                         <span className={`w-2 h-2 mt-1.5 rounded-full ${staff.role === 'Kitchen' ? 'bg-red-400' : staff.role === 'Barista' ? 'bg-amber-400' : 'bg-green-400'}`}></span>
-                                                                        <div><div className="font-medium text-slate-700">{staff.name}</div><div className="text-[10px] uppercase text-slate-400">{staff.role}</div></div>
+                                                                        <div>
+                                                                            <div className="font-medium text-slate-700 flex items-center gap-1">
+                                                                                {staff.name}
+                                                                                {staff.isSubstitute && <span title="Substitute Role" className="text-[9px] bg-slate-200 text-slate-600 px-1 rounded">SUB</span>}
+                                                                            </div>
+                                                                            <div className="text-[10px] uppercase text-slate-400">{staff.role}</div>
+                                                                        </div>
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                         </div>
-                                                        {/* S2 */}
+                                                        {/* SHIFT 2 */}
                                                         <div className="p-4 bg-amber-50/50 md:col-span-2 relative">
                                                             <div className="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg">PRIME (8)</div>
                                                             <div className="flex items-center gap-2 mb-3"><span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">SORE</span></div>
@@ -362,7 +358,11 @@
                                                                         <li key={staff.id} className="text-sm flex items-start gap-2">
                                                                             <span className={`w-2 h-2 mt-1.5 rounded-full ${staff.role === 'Kitchen' ? 'bg-red-400' : staff.role === 'Barista' ? 'bg-amber-400' : 'bg-green-400'}`}></span>
                                                                             <div>
-                                                                                <div className="font-medium text-slate-800 flex items-center gap-1">{staff.name} {staff.rank === 'Leader' && <Icons.Zap size={10} className="text-amber-600" fill="currentColor"/>}</div>
+                                                                                <div className="font-medium text-slate-800 flex items-center gap-1">
+                                                                                    {staff.name} 
+                                                                                    {staff.rank === 'Leader' && <Icons.Zap size={10} className="text-amber-600" fill="currentColor"/>}
+                                                                                    {staff.isSubstitute && <span title="Substitute Role" className="text-[9px] bg-slate-200 text-slate-600 px-1 rounded">SUB</span>}
+                                                                                </div>
                                                                                 <div className="text-[10px] uppercase text-slate-500">{staff.role}</div>
                                                                             </div>
                                                                         </li>
@@ -372,13 +372,19 @@
                                                                     {currentRoster[day].s2.slice(4).map(staff => (
                                                                         <li key={staff.id} className="text-sm flex items-start gap-2">
                                                                             <span className={`w-2 h-2 mt-1.5 rounded-full ${staff.role === 'Kitchen' ? 'bg-red-400' : staff.role === 'Barista' ? 'bg-amber-400' : 'bg-green-400'}`}></span>
-                                                                            <div><div className="font-medium text-slate-800">{staff.name}</div><div className="text-[10px] uppercase text-slate-500">{staff.role}</div></div>
+                                                                            <div>
+                                                                                <div className="font-medium text-slate-800 flex items-center gap-1">
+                                                                                    {staff.name}
+                                                                                    {staff.isSubstitute && <span title="Substitute Role" className="text-[9px] bg-slate-200 text-slate-600 px-1 rounded">SUB</span>}
+                                                                                </div>
+                                                                                <div className="text-[10px] uppercase text-slate-500">{staff.role}</div>
+                                                                            </div>
                                                                         </li>
                                                                     ))}
                                                                 </ul>
                                                             </div>
                                                         </div>
-                                                        {/* S3 */}
+                                                        {/* SHIFT 3 */}
                                                         <div className="p-4 bg-indigo-50/30">
                                                             <div className="flex items-center gap-2 mb-3"><span className="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded">MALAM (3)</span></div>
                                                             <ul className="space-y-2">
@@ -387,12 +393,11 @@
                                                                         <span className={`w-2 h-2 mt-1.5 rounded-full ${staff.role === 'Kitchen' ? 'bg-red-400' : staff.role === 'Barista' ? 'bg-amber-400' : 'bg-green-400'}`}></span>
                                                                         <div>
                                                                             <div className="font-medium text-slate-700 flex flex-col">
-                                                                                {staff.name}
-                                                                                {staff.isOverlap && (
-                                                                                    <span className="mt-1 text-[9px] bg-red-100 text-red-700 border border-red-200 px-1 py-0.5 rounded font-bold w-fit">
-                                                                                        💪 BANTU RUSH (20:00)
-                                                                                    </span>
-                                                                                )}
+                                                                                <span className="flex items-center gap-1">
+                                                                                    {staff.name}
+                                                                                    {staff.isSubstitute && <span title="Substitute Role" className="text-[9px] bg-slate-200 text-slate-600 px-1 rounded">SUB</span>}
+                                                                                </span>
+                                                                                {staff.isOverlap && <span className="mt-1 text-[9px] bg-red-100 text-red-700 border border-red-200 px-1 py-0.5 rounded font-bold w-fit">💪 BANTU RUSH (20:00)</span>}
                                                                             </div>
                                                                             <div className="text-[10px] uppercase text-slate-400">{staff.role}</div>
                                                                         </div>
@@ -409,14 +414,11 @@
                             </div>
                         )}
 
-                        {/* EMPLOYEES VIEW (CRUD) */}
                         {activeTab === 'employees' && (
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                                 <div className="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
                                     <div><h2 className="font-bold text-lg">Database Karyawan ({employees.length})</h2><p className="text-xs text-slate-500">Kelola data tim Anda di sini.</p></div>
-                                    <button onClick={() => handleOpenModal()} className="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                                        <Icons.Plus size={16} /> Tambah Tim
-                                    </button>
+                                    <button onClick={() => handleOpenModal()} className="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-2"><Icons.Plus size={16} /> Tambah Tim</button>
                                 </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm text-left">
@@ -442,7 +444,6 @@
                         )}
                     </main>
 
-                    {/* MODAL */}
                     {isModalOpen && (
                         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
