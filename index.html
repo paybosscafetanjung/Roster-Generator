@@ -38,7 +38,8 @@
             Clock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
             Alert: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
             Rotate: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>,
-            FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+            FileText: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>,
+            ShieldCheck: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
         };
 
         const INITIAL_EMPLOYEES = [
@@ -174,13 +175,14 @@
             const generateMonthRoster = () => {
                 let monthData = {};
                 let offPointer = 0; 
+                let prevNightIds = []; // PELACAK SHIFT: Menyimpan ID staf yg kerja malam kemarin
 
                 WEEKS.forEach(weekNum => {
                     let weekRoster = {};
                     DAYS.forEach(day => {
                         let dailyAssignment = { s1: [], s2: [], s3: [], off: [] };
 
-                        // Rolling Off Logic
+                        // 1. Rolling Off Logic (Tentukan siapa yang libur)
                         let todaysOffIds = [];
                         for(let i=0; i<3; i++) {
                              const index = offPointer % employees.length;
@@ -188,6 +190,7 @@
                              offPointer++; 
                         }
 
+                        // Filter staf yang tersedia (tidak sedang libur)
                         let availableForWork = employees.filter(e => !todaysOffIds.includes(e.id));
                         
                         let poolKitchen = shuffle(availableForWork.filter(e => e.role === 'Kitchen'));
@@ -195,8 +198,12 @@
                         let poolKasir = shuffle(availableForWork.filter(e => e.role === 'Kasir'));
                         let poolServer = shuffle(availableForWork.filter(e => e.role === 'Server'));
 
+                        // --- LOGIKA UTAMA: ASSIGNMENT SHIFT ---
+                        
+                        // Fungsi Helper: Ambil staf bebas untuk Shift Biasa (S2/S3)
                         const pickStaff = (rolePool, preferredRole) => {
                             if (rolePool.length > 0) return rolePool.pop();
+                            // Logic Substitusi jika role kosong
                             if (preferredRole === 'Kitchen' || preferredRole === 'Barista' || preferredRole === 'Kasir') {
                                 if (poolServer.length > 0) {
                                     const sub = poolServer.pop();
@@ -207,11 +214,40 @@
                             return null;
                         };
 
-                        // Shift Assignment
+                        // Fungsi Helper: Ambil staf AMAN untuk Shift Pagi (S1)
+                        // Tidak boleh mengambil orang yang ada di 'prevNightIds'
+                        const pickSafeS1 = (rolePool, preferredRole) => {
+                            // Cari kandidat yang TIDAK kerja malam kemarin
+                            const safeCandidateIndex = rolePool.findIndex(p => !prevNightIds.includes(p.id));
+                            
+                            if (safeCandidateIndex !== -1) {
+                                return rolePool.splice(safeCandidateIndex, 1)[0];
+                            }
+
+                            // Jika role utama habis/semua kena shift malam, coba cari pengganti (Server) yang aman
+                            if (preferredRole === 'Kitchen' || preferredRole === 'Barista' || preferredRole === 'Kasir') {
+                                const safeServerIndex = poolServer.findIndex(p => !prevNightIds.includes(p.id));
+                                if (safeServerIndex !== -1) {
+                                    const sub = poolServer.splice(safeServerIndex, 1)[0];
+                                    sub.isSubstitute = true;
+                                    return sub;
+                                }
+                            }
+                            
+                            // Jika terpaksa sekali (sangat jarang terjadi), return null
+                            return null;
+                        }
+
+                        // A. SHIFT 2 (SORE/PRIME) - Assign DULUAN
+                        // Kenapa duluan? Karena staf eks-Malam (prevNightIds) boleh kerja di sini (ada jeda cukup).
+                        // Kita habiskan stok mereka di sini agar tidak kepilih di S1.
                         for(let i=0; i<3; i++) { const s = pickStaff(poolKitchen, 'Kitchen'); if(s) dailyAssignment.s2.push(s); }
+                        
                         const leader = poolBarista.find(b => b.rank === 'Leader');
                         if(leader) {
-                            poolBarista = poolBarista.filter(b => b.id !== leader.id);
+                            // Hapus leader dari pool manual karena find tidak menghapus
+                            const lIdx = poolBarista.findIndex(b => b.id === leader.id);
+                            if(lIdx > -1) poolBarista.splice(lIdx, 1);
                             dailyAssignment.s2.push(leader);
                             const s = pickStaff(poolBarista, 'Barista'); if(s) dailyAssignment.s2.push(s);
                         } else {
@@ -220,13 +256,30 @@
                         for(let i=0; i<2; i++) { const s = pickStaff(poolServer, 'Server'); if(s) dailyAssignment.s2.push(s); }
                         for(let i=0; i<1; i++) { const s = pickStaff(poolKasir, 'Kasir'); if(s) dailyAssignment.s2.push(s); }
 
-                        const s1K = pickStaff(poolKitchen, 'Kitchen'); if(s1K) dailyAssignment.s1.push(s1K);
-                        const s1B = pickStaff(poolBarista, 'Barista'); if(s1B) dailyAssignment.s1.push(s1B);
-                        if(poolServer.length > 0) dailyAssignment.s1.push(poolServer.pop());
-                        else if(poolKasir.length > 0) dailyAssignment.s1.push(poolKasir.pop());
+                        // B. SHIFT 1 (PAGI) - Assign KEDUA
+                        // WAJIB menggunakan pickSafeS1 untuk mencegah Night -> Morning clash
+                        const s1K = pickSafeS1(poolKitchen, 'Kitchen'); if(s1K) dailyAssignment.s1.push(s1K);
+                        const s1B = pickSafeS1(poolBarista, 'Barista'); if(s1B) dailyAssignment.s1.push(s1B);
+                        
+                        // Untuk posisi ke-3 di pagi (Server/Kasir)
+                        let s1Flex = null;
+                        if(poolServer.length > 0) {
+                            // Cek server aman
+                            const idx = poolServer.findIndex(p => !prevNightIds.includes(p.id));
+                            if(idx !== -1) s1Flex = poolServer.splice(idx, 1)[0];
+                        } 
+                        if(!s1Flex && poolKasir.length > 0) {
+                            const idx = poolKasir.findIndex(p => !prevNightIds.includes(p.id));
+                            if(idx !== -1) s1Flex = poolKasir.splice(idx, 1)[0];
+                        }
+                        if(s1Flex) dailyAssignment.s1.push(s1Flex);
 
+
+                        // C. SHIFT 3 (MALAM) - Sisanya
+                        // Aman buat siapa saja (termasuk yang kerja malam kemarin -> jadi double night, itu boleh)
                         let overlapCandidate = null;
                         const s3K = pickStaff(poolKitchen, 'Kitchen'); if(s3K) dailyAssignment.s3.push(s3K);
+                        
                         if(poolBarista.length > 0) {
                             overlapCandidate = poolBarista.pop();
                             dailyAssignment.s3.push(overlapCandidate);
@@ -236,6 +289,7 @@
                         }
                         const s3C = pickStaff(poolKasir, 'Kasir'); if(s3C) dailyAssignment.s3.push(s3C);
 
+                        // Overlap Logic
                         const isWeekend = WEEKEND_DAYS.includes(day);
                         if (isWeekend && overlapCandidate) {
                             const index = dailyAssignment.s3.findIndex(e => e.id === overlapCandidate.id);
@@ -244,17 +298,20 @@
                             }
                         }
 
+                        // Finalisasi
                         dailyAssignment.off = employees.filter(e => todaysOffIds.includes(e.id));
                         weekRoster[day] = dailyAssignment;
+
+                        // UPDATE prevNightIds UNTUK BESOK
+                        prevNightIds = dailyAssignment.s3.map(e => e.id);
                     });
                     monthData[weekNum] = weekRoster;
                 });
                 
-                // Kalkulasi Laporan setelah generate
                 const stats = calculateStats(monthData, employees);
                 setMonthlyStats(stats);
                 setRosterData(monthData);
-                setActiveTab('report'); // Langsung pindah ke tab report
+                setActiveTab('report');
                 setActiveWeek(1);
             };
 
@@ -305,19 +362,19 @@
                                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                                         <Icons.Rotate size={20} className="text-green-500"/>
-                                        Solusi: Rolling Off (Libur Bergilir)
+                                        Fitur Otomatis
                                     </h2>
                                     <div className="grid md:grid-cols-2 gap-4">
                                         <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-                                            <h3 className="font-bold text-green-900 flex items-center gap-2"><Icons.UserCheck size={16}/> Distribusi Merata</h3>
+                                            <h3 className="font-bold text-green-900 flex items-center gap-2"><Icons.UserCheck size={16}/> Rolling Off (Libur)</h3>
                                             <p className="text-sm text-slate-700 mt-1">
-                                                Tidak ada lagi penumpukan libur di hari Minggu. Sistem merotasi 3 orang libur setiap harinya secara urut.
+                                                Distribusi libur merata. Sistem merotasi 3 orang libur setiap harinya secara urut agar semua kebagian jatah libur weekend.
                                             </p>
                                         </div>
-                                        <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
-                                            <h3 className="font-bold text-amber-900 flex items-center gap-2"><Icons.Zap size={16}/> Minggu Full Team</h3>
+                                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                                            <h3 className="font-bold text-blue-900 flex items-center gap-2"><Icons.ShieldCheck size={16}/> Anti-Clash Protection</h3>
                                             <p className="text-sm text-slate-700 mt-1">
-                                                Dijamin hari Minggu tetap memiliki 14 staff aktif, karena kuota libur disebar rata ke Senin-Sabtu juga.
+                                                Fitur Pintar: Karyawan yang masuk Shift Malam (S3) hari ini <b>DILARANG</b> masuk Pagi (S1) besoknya. Dijamin istirahat cukup.
                                             </p>
                                         </div>
                                     </div>
@@ -335,11 +392,17 @@
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
-                                            <span className="text-xs font-bold text-slate-500 px-2 uppercase">Pilih Minggu:</span>
-                                            {WEEKS.map(w => (
-                                                <button key={w} onClick={() => setActiveWeek(w)} className={`px-4 py-2 rounded-md text-sm font-bold transition-all whitespace-nowrap ${activeWeek === w ? 'bg-amber-500 text-white shadow-md' : 'hover:bg-slate-100 text-slate-600'}`}>Minggu {w}</button>
-                                            ))}
+                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+                                            <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+                                                <span className="text-xs font-bold text-slate-500 px-2 uppercase">Pilih Minggu:</span>
+                                                {WEEKS.map(w => (
+                                                    <button key={w} onClick={() => setActiveWeek(w)} className={`px-4 py-2 rounded-md text-sm font-bold transition-all whitespace-nowrap ${activeWeek === w ? 'bg-amber-500 text-white shadow-md' : 'hover:bg-slate-100 text-slate-600'}`}>Minggu {w}</button>
+                                                ))}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-xs font-medium text-green-700 bg-green-50 px-3 py-1.5 rounded-full border border-green-200">
+                                                <Icons.ShieldCheck size={14} />
+                                                Anti-Clash Active
+                                            </div>
                                         </div>
                                         <div className="grid gap-6">
                                             {DAYS.map((day) => (
